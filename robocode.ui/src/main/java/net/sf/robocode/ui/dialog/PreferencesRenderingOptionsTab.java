@@ -8,13 +8,14 @@
 package net.sf.robocode.ui.dialog;
 
 
-import net.sf.robocode.settings.ISettingsManager;
-import net.sf.robocode.ui.IImageManager;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.*;
+
+import net.sf.robocode.settings.ISettingsManager;
+import net.sf.robocode.ui.IImageManager;
 
 
 /**
@@ -35,7 +36,8 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JComboBox optionsRenderingNoBuffersComboBox;
 	private JCheckBox optionsRenderingBufferImagesCheckBox;
 	private JCheckBox optionsRenderingForceBulletColorCheckBox;
-
+	private JCheckBox optionsRenderingUseClassicGraphicsCheckBox;
+	
 	private JButton predefinedPlaformDefaultButton;
 	private JButton predefinedSpeedButton;
 	private JButton predefinedQualityButton;
@@ -153,6 +155,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 			otherSettingsPanel.setLayout(new BoxLayout(otherSettingsPanel, BoxLayout.Y_AXIS));
 			otherSettingsPanel.add(getOptionsRenderingBufferImagesCheckBox());
 			otherSettingsPanel.add(getOptionsRenderingForceBulletColorCheckBox());
+			otherSettingsPanel.add(getOptionsRenderingUseClassicGraphicsCheckBox());
 		}
 		return otherSettingsPanel;
 	}
@@ -231,11 +234,20 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 
 	private JCheckBox getOptionsRenderingForceBulletColorCheckBox() {
 		if (optionsRenderingForceBulletColorCheckBox == null) {
-			optionsRenderingForceBulletColorCheckBox = new JCheckBox("Make all bullets white");
+			optionsRenderingForceBulletColorCheckBox = new JCheckBox("Make all bullets white (classic)");
 			optionsRenderingForceBulletColorCheckBox.setMnemonic('M');
 			optionsRenderingForceBulletColorCheckBox.addActionListener(eventHandler);
 		}
 		return optionsRenderingForceBulletColorCheckBox;
+	}
+	
+	private JCheckBox getOptionsRenderingUseClassicGraphicsCheckBox() {
+		if (optionsRenderingUseClassicGraphicsCheckBox == null) {
+			optionsRenderingUseClassicGraphicsCheckBox = new JCheckBox("Use Classic Graphics");
+			optionsRenderingUseClassicGraphicsCheckBox.setMnemonic('M');
+			optionsRenderingUseClassicGraphicsCheckBox.addActionListener(eventHandler);
+		}
+		return optionsRenderingUseClassicGraphicsCheckBox;
 	}
 
 	private void loadPreferences(ISettingsManager props) {
@@ -245,6 +257,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		getOptionsRenderingNoBuffersComboBox().setSelectedIndex(props.getOptionsRenderingNoBuffers() - 1);
 		getOptionsRenderingBufferImagesCheckBox().setSelected(props.getOptionsRenderingBufferImages());
 		getOptionsRenderingForceBulletColorCheckBox().setSelected(props.getOptionsRenderingForceBulletColor());
+		getOptionsRenderingUseClassicGraphicsCheckBox().setSelected(props.getOptionsRenderingUseClassicGraphics());
 	}
 
 	public void storePreferences() {
@@ -256,6 +269,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		props.setOptionsRenderingNoBuffers(optionsRenderingNoBuffersComboBox.getSelectedIndex() + 1);
 		props.setOptionsRenderingBufferImages(optionsRenderingBufferImagesCheckBox.isSelected());
 		props.setOptionsRenderingForceBulletColor(optionsRenderingForceBulletColorCheckBox.isSelected());
+		props.setOptionsRenderingUseClassicGraphics(optionsRenderingUseClassicGraphicsCheckBox.isSelected());
 		properties.saveProperties();
 	}
 

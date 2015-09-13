@@ -8,19 +8,15 @@
 package net.sf.robocode.settings;
 
 
-import net.sf.robocode.io.FileUtil;
-import net.sf.robocode.io.Logger;
 import static net.sf.robocode.io.Logger.logError;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.RenderingHints;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
+
+import net.sf.robocode.io.FileUtil;
+import net.sf.robocode.io.Logger;
 
 
 /**
@@ -142,6 +138,9 @@ public class SettingsManager implements ISettingsManager {
 
 	private final List<ISettingsListener> listeners = new ArrayList<ISettingsListener>();
 
+	//Classic Graphics
+	private boolean optionsRenderingUseClassicGraphics = false;
+	
 	public SettingsManager() {
 		FileInputStream in = null;
 		try {
@@ -731,6 +730,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsRenderingBufferImages = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_BUFFER_IMAGES, "true"));
 		optionsRenderingForceBulletColor = Boolean.valueOf(
 				props.getProperty(OPTIONS_RENDERING_FORCE_BULLET_COLOR, "false"));
+		optionsRenderingUseClassicGraphics = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_USE_CLASSIC_GRAPHICS, "false"));
 
 		optionsSoundEnableSound = Boolean.valueOf(props.getProperty(OPTIONS_SOUND_ENABLESOUND, "false"));
 		optionsSoundEnableGunshot = Boolean.valueOf(props.getProperty(OPTIONS_SOUND_ENABLEGUNSHOT, "true"));
@@ -892,5 +892,16 @@ public class SettingsManager implements ISettingsManager {
 			}
 			return res;
 		}
+	}
+
+	@Override
+	public boolean getOptionsRenderingUseClassicGraphics() {
+		return optionsRenderingUseClassicGraphics;
+	}
+
+	@Override
+	public void setOptionsRenderingUseClassicGraphics(boolean useClassicGraphics) {
+		this.optionsRenderingUseClassicGraphics = useClassicGraphics;
+		props.setProperty(OPTIONS_RENDERING_USE_CLASSIC_GRAPHICS, "" + useClassicGraphics);
 	}
 }

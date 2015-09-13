@@ -8,10 +8,8 @@
 package net.sf.robocode.settings;
 
 
-import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.awt.RenderingHints;
+import java.io.*;
 import java.util.Collection;
 import java.util.Date;
 
@@ -243,6 +241,10 @@ public interface ISettingsManager {
 	void addPropertyListener(ISettingsListener listener);
 
 	void removePropertyListener(ISettingsListener propertyListener);
+	
+	boolean getOptionsRenderingUseClassicGraphics();
+
+	void setOptionsRenderingUseClassicGraphics(boolean useClassicGraphics);
 
 	public final static String
 			OPTIONS_VIEW_ROBOTNAMES = "robocode.options.view.robotNames",
@@ -265,7 +267,8 @@ public interface ISettingsManager {
 			OPTIONS_RENDERING_NO_BUFFERS = "robocode.options.rendering.noBuffers",
 			OPTIONS_RENDERING_BUFFER_IMAGES = "robocode.options.rendering.bufferImages",
 			OPTIONS_RENDERING_FORCE_BULLET_COLOR = "robocode.options.rendering.forceBulletColor",
-
+			OPTIONS_RENDERING_USE_CLASSIC_GRAPHICS = "robocode.options.rendering.useClassicGraphics",
+	
 			OPTIONS_SOUND_ENABLESOUND = "robocode.options.sound.enableSound",
 			OPTIONS_SOUND_ENABLEGUNSHOT = "robocode.options.sound.enableGunshot",
 			OPTIONS_SOUND_ENABLEBULLETHIT = "robocode.options.sound.enableBulletHit",

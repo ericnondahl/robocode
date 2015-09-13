@@ -22,7 +22,7 @@ import net.sf.robocode.ui.gfx.RenderImage;
  * @author Titus Chen (contributor)
  * @author Eric Nondahl (contributor)
  */
-public class ImageManager implements IImageManager {
+public class ImageManagerUpdate implements IImageManager {
 
 	private final ISettingsManager properties;
 
@@ -40,9 +40,10 @@ public class ImageManager implements IImageManager {
 	private HashMap<Integer, RenderImage> robotBodyImageCache;
 	private HashMap<Integer, RenderImage> robotGunImageCache;
 	private HashMap<Integer, RenderImage> robotRadarImageCache;
+
 	private Font smallFont;
 	
-	public ImageManager(ISettingsManager properties) {
+	public ImageManagerUpdate(ISettingsManager properties) {
 		this.properties = properties;
 	}
 
@@ -69,7 +70,7 @@ public class ImageManager implements IImageManager {
 
 	public Image getGroundTileImage(int index) {
 		if (groundImages[index] == null) {
-			groundImages[index] = getImage("/net/sf/robocode/ui/images/ground/blue_metal/blue_metal_" + index + ".png");
+			groundImages[index] = getImage("/net/sf/robocode/ui/images/ground/marble/marble_" + index + ".png");
 		}
 		return groundImages[index];
 	}
@@ -89,7 +90,7 @@ public class ImageManager implements IImageManager {
 				for (numFrame = 1;; numFrame++) {
 					filename = "/net/sf/robocode/ui/images/explosion/explosion" + numExplosion + '-' + numFrame + ".png";
 
-					if (ImageManager.class.getResource(filename) == null) {
+					if (ImageManagerUpdate.class.getResource(filename) == null) {
 						if (numFrame == 1) {
 							done = true;
 						} else {
@@ -252,13 +253,13 @@ public class ImageManager implements IImageManager {
 
 	@Override
 	public Color getTextColor() {
-		return Color.white;
+		return Color.black;
 	}
-
+	
 	@Override
 	public Font getSmallFont(double scale) {
 		if(smallFont == null) {
-			smallFont = new Font("Dialog", Font.PLAIN, (int) (10 / scale));
+			smallFont = new Font("Dialog", Font.BOLD, (int) (12 / scale));
 		}
 		
 		return smallFont;
@@ -266,25 +267,21 @@ public class ImageManager implements IImageManager {
 
 	@Override
 	public Color getBattleBorderColor() {
-		return Color.red;
+		return Color.black;
 	}
 
 	@Override
 	public Color getBulletColor(ISettingsManager settings, Color bulletColor) {
-		if (settings.getOptionsRenderingForceBulletColor()) {
-			return Color.WHITE;
-		} else {
-			return bulletColor;
-		}
+		return Color.black;
 	}
 
 	@Override
 	public double getBulletScaler() {
-		return 1;
+		return 2;
 	}
 
 	@Override
 	public float getScanAlpha() {
-		return .2f;
+		return .3f;
 	}
 }

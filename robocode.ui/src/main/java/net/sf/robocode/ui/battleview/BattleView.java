@@ -8,25 +8,7 @@
 package net.sf.robocode.ui.battleview;
 
 
-import net.sf.robocode.battle.snapshot.RobotSnapshot;
-import net.sf.robocode.robotpaint.Graphics2DSerialized;
-import net.sf.robocode.robotpaint.IGraphicsProxy;
-import net.sf.robocode.settings.ISettingsManager;
-import net.sf.robocode.settings.ISettingsListener;
-import net.sf.robocode.ui.IImageManager;
-import net.sf.robocode.ui.IWindowManager;
-import net.sf.robocode.ui.IWindowManagerExt;
-import net.sf.robocode.ui.gfx.GraphicsState;
-import net.sf.robocode.ui.gfx.RenderImage;
-import net.sf.robocode.ui.gfx.RobocodeLogo;
-import robocode.BattleRules;
-import robocode.control.events.BattleAdaptor;
-import robocode.control.events.BattleFinishedEvent;
-import robocode.control.events.BattleStartedEvent;
-import robocode.control.events.TurnEndedEvent;
-import robocode.control.snapshot.IBulletSnapshot;
-import robocode.control.snapshot.IRobotSnapshot;
-import robocode.control.snapshot.ITurnSnapshot;
+import static java.lang.Math.*;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -34,8 +16,18 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import static java.lang.Math.*;
 import java.util.Random;
+
+import net.sf.robocode.battle.snapshot.RobotSnapshot;
+import net.sf.robocode.robotpaint.Graphics2DSerialized;
+import net.sf.robocode.robotpaint.IGraphicsProxy;
+import net.sf.robocode.settings.ISettingsListener;
+import net.sf.robocode.settings.ISettingsManager;
+import net.sf.robocode.ui.*;
+import net.sf.robocode.ui.gfx.*;
+import robocode.BattleRules;
+import robocode.control.events.*;
+import robocode.control.snapshot.*;
 
 
 /**
@@ -51,7 +43,8 @@ public class BattleView extends Canvas {
 	private final static Color CANVAS_BG_COLOR = SystemColor.controlDkShadow;
 
 	private final static Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
-
+	private final static Area BULLET_BACKGROUND_AREA = new Area(new Ellipse2D.Double(-1.5, -1.5, 3, 3));
+	
 	private final static int ROBOT_TEXT_Y_OFFSET = 24;
 
 	private BattleRules battleRules;
@@ -61,12 +54,9 @@ public class BattleView extends Canvas {
 
 	private boolean initialized;
 	private double scale = 1.0;
-
+	
 	// Ground
 	private int[][] groundTiles;
-
-	private final int groundTileWidth = 64;
-	private final int groundTileHeight = 64;
 
 	private Image groundImage;
 
@@ -104,6 +94,7 @@ public class BattleView extends Canvas {
 		this.windowManager = (IWindowManagerExt) windowManager;
 		this.imageManager = imageManager; 
 
+		imageManager.initialize();
 		battleField = new BattleField(800, 600);
 
 		new BattleObserver(windowManager);
@@ -222,7 +213,7 @@ public class BattleView extends Canvas {
 		}
 
 		// Scale font
-		smallFont = new Font("Dialog", Font.PLAIN, (int) (10 / scale));
+		smallFont = imageManager.getSmallFont(scale);
 		smallFontMetrics = bufferStrategy.getDrawGraphics().getFontMetrics();
 
 		// Initialize ground image
@@ -240,15 +231,15 @@ public class BattleView extends Canvas {
 
 		Random r = new Random(); // independent
 
-		final int NUM_HORZ_TILES = battleField.getWidth() / groundTileWidth + 1;
-		final int NUM_VERT_TILES = battleField.getHeight() / groundTileHeight + 1;
+		final int NUM_HORZ_TILES = battleField.getWidth() / imageManager.getGroundTileWidth() + 1;
+		final int NUM_VERT_TILES = battleField.getHeight() / imageManager.getGroundTileHeight() + 1;
 
 		if ((groundTiles == null) || (groundTiles.length != NUM_VERT_TILES) || (groundTiles[0].length != NUM_HORZ_TILES)) {
 
 			groundTiles = new int[NUM_VERT_TILES][NUM_HORZ_TILES];
 			for (int y = NUM_VERT_TILES - 1; y >= 0; y--) {
 				for (int x = NUM_HORZ_TILES - 1; x >= 0; x--) {
-					groundTiles[y][x] = (int) round(r.nextDouble() * 4);
+					groundTiles[y][x] = r.nextInt(imageManager.getGroundTileCount());
 				}
 			}
 		}
@@ -271,7 +262,7 @@ public class BattleView extends Canvas {
 				Image img = imageManager.getGroundTileImage(groundTiles[y][x]);
 
 				if (img != null) {
-					groundGfx.drawImage(img, x * groundTileWidth, y * groundTileHeight, null);
+					groundGfx.drawImage(img, x * imageManager.getGroundTileWidth(), y * imageManager.getGroundTileHeight(), null);
 				}
 			}
 		}
@@ -382,7 +373,7 @@ public class BattleView extends Canvas {
 
 		g.setClip(null);
 
-		g.setColor(Color.RED);
+		g.setColor(imageManager.getBattleBorderColor());
 		g.drawRect(-1, -1, battleField.getWidth() + 2, battleField.getHeight() + 2);
 
 		g.setClip(savedClip);
@@ -466,7 +457,7 @@ public class BattleView extends Canvas {
 			int y = battleField.getHeight() - (int) robotSnapshot.getY();
 
 			if (drawRobotEnergy) {
-				g.setColor(Color.white);
+				g.setColor(imageManager.getTextColor());
 				int ll = (int) robotSnapshot.getEnergy();
 				int rl = (int) ((robotSnapshot.getEnergy() - ll + .001) * 10.0);
 
@@ -482,7 +473,7 @@ public class BattleView extends Canvas {
 						smallFontMetrics);
 			}
 			if (drawRobotName) {
-				g.setColor(Color.white);
+				g.setColor(imageManager.getTextColor());
 				centerString(g, robotSnapshot.getVeryShortName(), x,
 						y + ROBOT_TEXT_Y_OFFSET + smallFontMetrics.getHeight() / 2, smallFont, smallFontMetrics);
 			}
@@ -552,17 +543,12 @@ public class BattleView extends Canvas {
 
 				// radius = sqrt(x^2 / 0.1 * power), where x is the width of 1 pixel for a minimum 0.1 bullet
 				double scale = max(2 * sqrt(2.5 * bulletSnapshot.getPower()), 2 / this.scale);
-
+				scale *= imageManager.getBulletScaler();
+				
 				at.scale(scale, scale);
 				Area bulletArea = BULLET_AREA.createTransformedArea(at);
 
-				Color bulletColor;
-
-				if (properties.getOptionsRenderingForceBulletColor()) {
-					bulletColor = Color.WHITE;
-				} else {
-					bulletColor = new Color(bulletSnapshot.getColor());
-				}
+				Color bulletColor = imageManager.getBulletColor(properties, new Color(bulletSnapshot.getColor()));
 				g.setColor(bulletColor);
 				g.fill(bulletArea);
 
@@ -587,7 +573,7 @@ public class BattleView extends Canvas {
 
 	private void centerString(Graphics2D g, String s, int x, int y, Font font, FontMetrics fm) {
 		g.setFont(font);
-
+		
 		int width = fm.stringWidth(s);
 		int height = fm.getHeight();
 		int descent = fm.getDescent();
@@ -625,7 +611,7 @@ public class BattleView extends Canvas {
 
 		final Composite savedComposite = g.getComposite();
 
-		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageManager.getScanAlpha()));
 
 		scanArc.setAngleStart((360 - scanArc.getAngleStart() - scanArc.getAngleExtent()) % 360);
 		scanArc.y = battleField.getHeight() - robotSnapshot.getY() - robocode.Rules.RADAR_SCAN_RADIUS;

@@ -8,9 +8,10 @@
 package net.sf.robocode.ui;
 
 
-import net.sf.robocode.ui.gfx.RenderImage;
-
 import java.awt.*;
+
+import net.sf.robocode.settings.ISettingsManager;
+import net.sf.robocode.ui.gfx.RenderImage;
 
 
 /**
@@ -30,4 +31,22 @@ public interface IImageManager {
 	RenderImage getColoredGunRenderImage(Integer color);
 
 	RenderImage getColoredRadarRenderImage(Integer color);
+	
+	int getGroundTileWidth();
+	
+	int getGroundTileHeight();
+	
+	int getGroundTileCount();
+	
+	Color getTextColor();
+	
+	Color getBattleBorderColor();
+	
+	Font getSmallFont(double scale);
+	
+	Color getBulletColor(ISettingsManager settings, Color bulletColor);
+	
+	double getBulletScaler();
+	
+	float getScanAlpha();
 }
